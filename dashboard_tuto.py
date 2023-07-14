@@ -26,6 +26,7 @@ if __name__ == "__main__":
 
 
 import streamlit as st
+import FastAPI
 import pandas as pd
 import numpy as np
 import time
