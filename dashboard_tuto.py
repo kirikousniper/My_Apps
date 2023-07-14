@@ -1,11 +1,41 @@
+from fastapi import FastAPI
+import uvicorn
+import pandas as pd
+
+app = FastAPI()
+@app.get("/data_join")
+async def data_join():
+
+    impressions = pd.read_csv("https://raw.githubusercontent.com/kirikousniper/My_Apps/main/impressions.csv")
+
+    clics = pd.read_csv("https://raw.githubusercontent.com/kirikousniper/My_Apps/main/clics.csv")
+
+    achats = pd.read_csv("https://raw.githubusercontent.com/kirikousniper/My_Apps/main/achats.csv")
+
+
+    results= pd.merge(impressions, clics, on="cookie_id", how="left")
+    fusion = pd.merge(results, achats, on="cookie_id", how="left")
+
+    fusion_data=fusion.fillna("-")
+
+    return fusion_data.to_dict(orient="records")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000) 
+
+
+
 import streamlit as st
 import pandas as pd
 import numpy as np
+import time
 import plotly.express as px
 import plotly.graph_objects as go
+import requests
 #from plotly.subplots import make_subplots as ms
 st.set_page_config(page_title='SWAST - Handover Delays',  layout='wide')
 t1, t2 = st.columns((0.07, 1))
+t1.image('R.jpeg', width=120)
 t2.title("My Marketing Dashboard")
 t2.markdown("This app is created by Moussa Fall as a academic project")
 st.balloons()
@@ -42,18 +72,19 @@ def main():
 if __name__ == "__main__":
     main()
 
-impressions_df = pd.read_csv('impressions.csv')
-clics_df = pd.read_csv('clics.csv')
-achats_df = pd.read_csv('achats.csv')
-### Fusion des données
-donnees_fusionnees = pd.merge(impressions_df, clics_df, on='cookie_id')
-donnees = pd.merge(donnees_fusionnees, achats_df, on='cookie_id')
-base = donnees
-basefinale = pd.DataFrame(base)
+response = requests.get("http://127.0.0.1:8000/data_join")
+base = response.json()
+base = pd.DataFrame(base)
+basefinale = base.replace("-", pd.NA)
+st.write(basefinale)
+
 toggle = st.checkbox("To view data", value=True, help="Untick if you wanna see data.")
 click = st.button("Data", disabled=bool(toggle))
 if click:
     st.write(basefinale)
+
+with st.spinner('Wait for it...'):
+    time.sleep(10)
 
 
 campaign_filter = st.selectbox("Select the campaign id", pd.unique(basefinale['campaign_id']))
@@ -104,6 +135,7 @@ with fig_col01:
     st.plotly_chart(fig, use_container_width=True)
 
 with fig_col02:
+    st.markdown("##### Average ages by product")
     fig2 = px.bar(data_frame=avg_ages, x="product_id", y="age")
     fig.update_layout(
         xaxis_title='Product_id',
@@ -146,7 +178,6 @@ with fig_col1:
     st.plotly_chart(fig, use_container_width=True)
 
     with fig_col2:
-        st.markdown("#### Average ages by product")
         fig2 = px.bar(data_frame=basefinale, x="campaign_id", y="price")
         fig2.update_layout(
             xaxis_title='campaign_id',
@@ -162,8 +193,3 @@ with st.expander("Contact us"):
         st.text_area("Query", "Please fill in all the information or we may not be able to process your request")
 
         submit_button = st.form_submit_button(label='Send Information')
-
-
-
-
-
