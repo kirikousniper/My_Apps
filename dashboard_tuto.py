@@ -1,14 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import time
 import plotly.express as px
 import plotly.graph_objects as go
-import requests
 #from plotly.subplots import make_subplots as ms
 st.set_page_config(page_title='SWAST - Handover Delays',  layout='wide')
 t1, t2 = st.columns((0.07, 1))
-t1.image('R.jpeg', width=120)
 t2.title("My Marketing Dashboard")
 t2.markdown("This app is created by Moussa Fall as a academic project")
 st.balloons()
@@ -57,9 +54,6 @@ toggle = st.checkbox("To view data", value=True, help="Untick if you wanna see d
 click = st.button("Data", disabled=bool(toggle))
 if click:
     st.write(basefinale)
-
-with st.spinner('Wait for it...'):
-    time.sleep(10)
 
 
 campaign_filter = st.selectbox("Select the campaign id", pd.unique(basefinale['campaign_id']))
