@@ -77,7 +77,10 @@ response = requests.get("http://127.0.0.1:8000/data_join")
 base = response.json()
 base = pd.DataFrame(base)
 basefinale = base.replace("-", pd.NA)
-st.write(basefinale)
+
+basefinale['timestamp'] = pd.to_datetime(basefinale['timestamp'], unit="s")
+basefinale['timestamp_x'] = pd.to_datetime(basefinale['timestamp_x'], unit="s")
+basefinale['timestamp_y'] = pd.to_datetime(basefinale['timestamp_y'], unit="s")
 
 toggle = st.checkbox("To view data", value=True, help="Untick if you wanna see data.")
 click = st.button("Data", disabled=bool(toggle))
