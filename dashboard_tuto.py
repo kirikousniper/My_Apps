@@ -146,7 +146,7 @@ with fig_col1:
     st.plotly_chart(fig, use_container_width=True)
 
     with fig_col2:
-        st.markdown("Average ages by product")
+        st.markdown("#### Average ages by product")
         fig2 = px.bar(data_frame=basefinale, x="campaign_id", y="price")
         fig2.update_layout(
             xaxis_title='campaign_id',
